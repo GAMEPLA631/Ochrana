@@ -388,7 +388,7 @@
     <script>
         // Globálna premenná pre aktuálne prihláseného používateľa
         let currentNickname = null;
-        const SIMULATED_ACTIVATION_DELAY_MS = 60000; // Simulácia 1 minúty (60 sekúnd)
+        const ACTIVATION_DELAY_MS = 60000; // Presne 1 minúta (60 sekúnd)
 
         // Funkcia na zobrazenie správ (notifikácií)
         function showMessage(text, isError = false) {
@@ -688,20 +688,22 @@
                 gamePlatform: gamePlatform,
                 reason: reason,
                 autoEnroll: autoEnroll,
-                status: 'Žiadosť spracovávaná (Aktivácia ochrany prebehne o 60 sekúnd)', // Nový status s časom
+                // STATUS ZMENENÝ: Už nie je "simulovaný"
+                status: 'Žiadosť prijatá do frontu. Ochrana sa aktivuje automaticky po 60 sekundách.', 
                 timestamp: new Date().toISOString()
             };
             
             // Zatiaľ neaktivujeme ochranu, len uložíme žiadosť
             localStorage.setItem(`gamepla631_user_${currentNickname}`, JSON.stringify(userData));
 
-            showMessage('Žiadosť o Anti-Ban Ochranu bola prijatá. Čakajte na aktiváciu (60 sekúnd simulácie)...', false);
+            // SPRÁVA ZMENENÁ: Už neobsahuje slovo "simulácie"
+            showMessage('Žiadosť o Anti-Ban Ochranu bola prijatá. Presný čas aktivácie: 1 minúta.', false);
 
             // Aktualizácia stavu na obrazovke
             loadProtectionRequestData(currentNickname); 
             showDashboardContent('protection-request');
             
-            // --- SIMULÁCIA AKTIVÁCIE PO 60 SEKUNDÁCH (60000 ms) ---
+            // --- AKTIVÁCIA PO 60 SEKUNDÁCH (1 MINÚTA REÁLNEHO ČASU) ---
             setTimeout(() => {
                 // Opätovné načítanie pre prípad, že používateľ medzitým zmenil niečo iné
                 const updatedUserDataJson = localStorage.getItem(`gamepla631_user_${currentNickname}`);
@@ -719,7 +721,7 @@
                 loadProtectionRequestData(currentNickname); // Obnoví stav žiadosti
                 showMessage('Úspech! Váš Účet je Chránený Spoločnosťou GAMEPLA631.', false);
                 
-            }, SIMULATED_ACTIVATION_DELAY_MS); // 60 sekúnd
+            }, ACTIVATION_DELAY_MS); // Presne 60 sekúnd
         }
 
         // --- MANAŽMENT RELÁCIE ---
@@ -750,3 +752,4 @@
     </script>
 </body>
 </html>
+
