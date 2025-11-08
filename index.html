@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAMEPLA631 - Moderný Hráčsky Portál</title>
+    
+    <!-- WEB IKONA (FAVICON) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%239333ea' d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm4.36 10.36L9.64 8l2.72-2.36a.75.75 0 0 0-.72-1.28L8 6.72 5.36 4.36a.75.75 0 0 0-1.28.72L6.36 8l-2.72 2.36a.75.75 0 0 0 .72 1.28L8 9.28l2.36 2.36a.75.75 0 0 0 1.28-.72Z'/%3E%3C/svg%3E" type="image/svg+xml">
+
+    <!-- Načítanie Tailwind CSS pre moderný dizajn -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Nastavenie písma Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Predvolené pozadie je tmavý gradient pre neprihlásenú/landing stránku */
+            background: linear-gradient(135deg, #1f2937 0%, #4f46e5 100%); 
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease; /* Plynulý prechod pri prihlásení */
+        }
+
+        /* Telo pre Dashboard view (po prihlásení) */
+        body.dashboard-active {
+            background: #1f2937; /* Tmavé pozadie pre Dashboard */
+        }
+
+        /* Hlavný gradient pre Hero sekciu */
+        .hero-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); /* Modro-fialový gradient */
+            border-radius: 0 0 50% 50% / 0 0 30% 30%; /* Organický tvar spodnej časti */
+            min-height: 80vh;
+            padding-top: 5rem;
+            position: relative;
+        }
+
+        /* Prekrytie tvarov (Waves/Lines) */
+        .wave-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Moderné tlačidlo */
+        .modern-button {
+            background: linear-gradient(90deg, #3b82f6, #9333ea);
+            box-shadow: 0 5px 20px rgba(147, 51, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        .modern-button:hover {
+            box-shadow: 0 8px 30px rgba(147, 51, 234, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        /* Moderný vstup pre formuláre */
+        .modern-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
+        .modern-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Modal pozadie */
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Modal karta */
+        .modal-card {
+            background-color: #1f2937;
+            border: 1px solid #4f46e5;
+            box-shadow: 0 10px 40px rgba(79, 70, 229, 0.5);
+        }
+        
+        /* Aktívny tab v Modale */
+        .modal-tab.active {
+            border-bottom-color: #9333ea;
+            color: #ffffff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Kontajner pre správy (zostáva na vrchu) -->
+    <div id="message-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 hidden p-3 rounded-xl text-sm text-center font-medium z-50 shadow-2xl transition duration-500 opacity-0"></div>
+
+    <!-- 1. LANDING PAGE / HERO SECTION -->
+    <div id="landing-view">
+        
+        <!-- Navigácia -->
+        <nav class="p-4 z-20 relative max-w-7xl mx-auto">
+            <div class="flex justify-between items-center">
+                <div class="text-2xl font-bold text-white flex items-center">
+                    <span class="text-3xl mr-2 text-purple-400">🎮</span> GAMEPLA631
+                </div>
+                <!-- Menu len pre desktop (simulácia) -->
+                <div class="hidden md:flex space-x-6 text-sm text-white/80">
+                    <a href="#" class="hover:text-white transition">Domov</a>
+                    <a href="#" class="hover:text-white transition">O nás</a>
+                    <a href="#" class="hover:text-white transition">Služby</a>
+                    <a href="#" class="hover:text-white transition">Fórum</a>
+                    <a href="#" class="hover:text-white transition">Kontakt</a>
+                </div>
+                <div class="text-sm text-white/80 hidden md:block">
+                    +421 9XX XXX XXX
+                </div>
+            </div>
+        </nav>
+
+        <!-- HERO SEKECIA s gradientom a vlnami -->
+        <div class="hero-gradient z-10">
+            <!-- Vlnité linky na pozadí (SVG) -->
+            <div class="wave-lines">
+                <svg viewBox="0 0 1440 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <!-- Fialová vlna -->
+                    <path d="M0 100 Q 360 200, 720 100 T 1440 100 V 400 H 0 V 100 Z" fill="#9333ea" opacity="0.1"/>
+                    <!-- Modrá vlna -->
+                    <path d="M0 200 Q 360 300, 720 200 T 1440 200 V 400 H 0 V 200 Z" fill="#3b82f6" opacity="0.1"/>
+                </svg>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-4 relative z-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Ľavá strana (Text) -->
+                <div class="space-y-6 pt-10 lg:pt-0">
+                    <p class="text-purple-300 uppercase tracking-widest font-semibold text-sm">Beyond Your Wildest Dreams</p>
+                    <h1 class="text-6xl font-extrabold leading-tight text-white">
+                        TVOJA DIGITÁLNA PRÍTOMNOSŤ <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">JE PRIPRAVENÁ NA ŠTART</span>
+                    </h1>
+                    <p class="text-lg text-white/80 max-w-md">
+                        Pripoj sa k hráčom z celého Slovenska, ktorí sú overení, a objav bezpečnejší herný svet. Registrácia a prihlásenie sú uložené v tvojom prehliadači.
+                    </p>
+                    <button id="cta-button" onclick="openAuthModal()" class="modern-button text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl">
+                        Vstup do Portálu
+                    </button>
+                </div>
+
+                <!-- Pravá strana (Grafika) -->
+                <div class="flex justify-center lg:justify-end">
+                    <!-- Placeholder pre futuristický obrázok -->
+                    <div class="bg-white/10 rounded-3xl p-6 shadow-2xl border-2 border-white/20">
+                        <img src="https://placehold.co/400x300/4f46e5/ffffff?text=Futuristick%C3%A1+Komunita" alt="[Obrázok portálu GAMEPLA631 s futuristickým dizajnom a modro-fialovým gradientom.]" class="rounded-2xl w-full max-w-md h-auto object-cover border border-purple-400/50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pätička (Pre Landing Page) -->
+        <footer class="text-center py-6 text-sm text-white/60">
+            <p>GAMEPLA631 V4.1 | Používa lokálne úložisko prehliadača (localStorage) pre dáta profilu a žiadostí.</p>
+        </footer>
+    </div>
+    
+    <!-- 2. AUTENTIFIKAČNÝ MODAL (Prihlásenie/Registrácia) -->
+    <div id="auth-modal" class="fixed inset-0 modal-bg hidden flex items-center justify-center p-4 z-50 transition duration-300">
+        
+        <div class="max-w-md w-full modal-card rounded-2xl p-8 space-y-6 relative">
+            <!-- Tlačidlo Zavrieť -->
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-white/70 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <header class="text-center">
+                <h2 class="text-3xl font-extrabold text-white">Prístup do Portálu</h2>
+            </header>
+
+            <!-- Menu/Tabulátory Modalu -->
+            <div class="flex border-b border-white/20">
+                <button id="tab-login" class="modal-tab active flex-1 py-3 text-white/70 hover:text-white transition border-b-2 border-transparent" onclick="showTab('login')">Prihlásenie</button>
+                <button id="tab-register" class="modal-tab flex-1 py-3 text-white/70 hover:text-white transition border-b-2 border-transparent" onclick="showTab('register')">Registrácia</button>
+            </div>
+
+            <!-- Prihlasovací Formulár -->
+            <div id="form-login" class="space-y-6">
+                <div>
+                    <label for="login-nickname" class="block text-sm font-medium text-white/70 mb-1">Komunitné Meno (Nickname)</label>
+                    <input type="text" id="login-nickname" class="modern-input w-full p-3 rounded-lg border focus:outline-none" placeholder="TvojUnikátnyNickname">
+                </div>
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-white/70 mb-1">Heslo</label>
+                    <input type="password" id="login-password" class="modern-input w-full p-3 rounded-lg border focus:outline-none" placeholder="******">
+                    <a href="#" onclick="showMessage('Obnovenie hesla je simulované.', true); return false;" class="text-xs text-blue-400 hover:text-blue-300 mt-1 inline-block transition duration-200">Zabudol si heslo?</a>
+                </div>
+                <button onclick="handleLogin()" class="modern-button w-full text-white font-bold py-3 rounded-lg text-lg">PRIHLÁSIŤ</button>
+            </div>
+
+            <!-- Registračný Formulár -->
+            <div id="form-register" class="space-y-6 hidden">
+                <p class="text-white/70 text-sm">Vytvor si nový účet. Registruj toľko účtov, koľko potrebuješ.</p>
+                <div>
+                    <label for="reg-nickname" class="block text-sm font-medium text-white/70 mb-1">Komunitné Meno</label>
+                    <input type="text" id="reg-nickname" class="modern-input w-full p-3 rounded-lg border focus:outline-none" placeholder="NovéKomunitnéMeno">
+                </div>
+                <div>
+                    <label for="reg-age" class="block text-sm font-medium text-white/70 mb-1">Tvoj Vek</label>
+                    <input type="number" id="reg-age" class="modern-input w-full p-3 rounded-lg border focus:outline-none" placeholder="18" min="10" max="99">
+                </div>
+                <div>
+                    <label for="reg-password" class="block text-sm font-medium text-white/70 mb-1">Heslo</label>
+                    <input type="password" id="reg-password" class="modern-input w-full p-3 rounded-lg border focus:outline-none" placeholder="******">
+                </div>
+                <div class="flex items-start">
+                    <input id="reg-protection" type="checkbox" class="mt-1 h-4 w-4 text-purple-500 rounded border-gray-600 focus:ring-purple-500 bg-gray-700" checked>
+                    <label for="reg-protection" class="ml-3 text-sm text-white/70">Súhlasím so zaradením do komunitného systému GAMEPLA631.</label>
+                </div>
+                <button onclick="handleRegistration()" class="modern-button w-full text-white font-bold py-3 rounded-lg text-lg">Registrovať Nový Účet</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 3. DASHBOARD VIEW (Dostupný len po prihlásení) -->
+    <div id="dashboard-view" class="max-w-6xl w-full mx-auto p-4 lg:p-8 space-y-8 hidden">
+        
+        <!-- Dashboard Header a Odhlásenie -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-700">
+            <h2 id="dashboard-welcome" class="text-3xl font-extrabold text-white">Vitaj, Operátor [Nickname]</h2>
+            <button onclick="handleLogout()" class="mt-3 md:mt-0 text-sm px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline-block mr-1 align-sub" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Odhlásiť sa
+            </button>
+        </header>
+
+        <!-- DASHBOARD MENU -->
+        <div class="flex flex-wrap space-x-2 md:space-x-4 border-b border-gray-700 pb-2 mb-4">
+            <button onclick="showDashboardContent('overview')" id="menu-overview" class="dash-menu-button px-4 py-2 rounded-lg text-white transition bg-purple-600/50 border border-purple-500/50">Prehľad Systému</button>
+            <button onclick="showDashboardContent('profile')" id="menu-profile" class="dash-menu-button px-4 py-2 rounded-lg text-white/70 transition hover:bg-gray-700/50">Správa Profilu (Formulár)</button>
+            <button onclick="showDashboardContent('protection-request')" id="menu-protection-request" class="dash-menu-button px-4 py-2 rounded-lg text-white/70 transition hover:bg-gray-700/50">Žiadosť o Anti-Ban Ochranu</button>
+            <button onclick="showDashboardContent('monitor')" id="menu-monitor" class="dash-menu-button px-4 py-2 rounded-lg text-white/70 transition hover:bg-gray-700/50">Systémový Monitoring</button>
+            <button onclick="showDashboardContent('logs')" id="menu-logs" class="dash-menu-button px-4 py-2 rounded-lg text-white/70 transition hover:bg-gray-700/50">Audit Logs</button>
+        </div>
+
+        <!-- 1. Prehľad Systému -->
+        <div id="content-overview" class="dashboard-content space-y-6">
+            <h3 class="text-2xl font-semibold text-purple-400 border-b border-gray-700 pb-2">Stav Zabezpečenia</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="p-5 rounded-xl bg-green-900/40 border border-green-700/50 shadow-md">
+                    <p class="text-2xl font-bold text-green-300">99.9%</p>
+                    <p class="text-gray-400 text-sm">Úroveň Kompatibility</p>
+                </div>
+                <div class="p-5 rounded-xl bg-blue-900/40 border border-blue-700/50 shadow-md">
+                    <p class="text-2xl font-bold text-blue-300" id="profile-nickname-overview">[Nick]</p>
+                    <p class="text-gray-400 text-sm">Aktívny Komunitný Účet</p>
+                </div>
+                <div class="p-5 rounded-xl bg-purple-900/40 border border-purple-700/50 shadow-md">
+                    <p class="text-2xl font-bold text-purple-300">LOW</p>
+                    <p class="text-gray-400 text-sm">Riziko Detekcie</p>
+                </div>
+            </div>
+            
+            <h3 class="xl font-semibold text-white/90 mt-6">Dôležité Správy</h3>
+            <ul class="space-y-3 text-sm text-gray-400">
+                <li class="p-3 border-l-4 border-blue-500 bg-gray-800/50 rounded-lg">Aktualizácia V4.1: Pridaná funkcia Žiadosť o Anti-Ban ochranu. Vyplň formulár v novej sekcii!</li>
+                <li class="p-3 border-l-4 border-yellow-500 bg-gray-800/50 rounded-lg">Upozornenie: Lokálne uložené dáta nie sú šifrované. Použi silné heslo.</li>
+            </ul>
+        </div>
+
+        <!-- 2. Správa Profilu (EDITOVATEĽNÝ FORMULÁR) -->
+        <div id="content-profile" class="dashboard-content space-y-6 hidden bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+            <h3 class="text-2xl font-semibold text-purple-400 border-b border-gray-700 pb-2">Úprava Komunitného Profilu (Formulár)</h3>
+            <p class="text-white/70 text-sm">Zadaj svoje nové detaily. Zmeny sa uložia do tvojho prehliadača.</p>
+
+            <div class="space-y-4 max-w-lg">
+                <div class="p-3 bg-gray-700/50 rounded-lg">
+                    <label class="block text-sm text-gray-400">Komunitné Meno (Nickname) - Needitovateľné</label>
+                    <p id="profile-nickname" class="text-xl font-mono text-white mt-1 break-all">N/A</p>
+                </div>
+                
+                <div>
+                    <label for="edit-age" class="block text-sm font-medium text-white/70 mb-1">Vek</label>
+                    <input type="number" id="edit-age" class="modern-input w-full p-3 rounded-lg" min="10" max="99">
+                </div>
+
+                <div>
+                    <label for="edit-description" class="block text-sm font-medium text-white/70 mb-1">Popis Hráča (Prečo si bežný hráč)</label>
+                    <textarea id="edit-description" rows="3" class="modern-input w-full p-3 rounded-lg" placeholder="Sem napíš, prečo ťa systém považuje za normálneho hráča."></textarea>
+                </div>
+
+                <div class="p-3 bg-gray-700/50 rounded-lg">
+                    <label class="block text-sm text-gray-400">Status GAMEPLA631 Ochrany</label>
+                    <p id="profile-status" class="text-xl font-bold status-active mt-1">N/A</p>
+                </div>
+                
+                <button onclick="handleProfileUpdate()" class="modern-button text-white font-bold py-3 px-6 rounded-lg text-lg w-full">
+                    Uložiť Zmeny Profilu
+                </button>
+            </div>
+        </div>
+        
+        <!-- 3. Žiadosť o Anti-Ban Ochranu (NOVÝ FORMULÁR) -->
+        <div id="content-protection-request" class="dashboard-content space-y-6 hidden bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+            <h3 class="text-2xl font-semibold text-purple-400 border-b border-gray-700 pb-2">Žiadosť o Systémovú Ochrana (Anti-Ban)</h3>
+            <p class="text-white/70 text-sm">Vyplňte formulár a požiadajte o zaradenie do špeciálneho protokolu na ochranu pred neoprávnenými banmi. Tieto dáta sú lokálne uložené vo vašom profile.</p>
+
+            <div class="space-y-4 max-w-lg">
+                <div>
+                    <label for="req-game-id" class="block text-sm font-medium text-white/70 mb-1">Herné ID (Gamertag/In-game meno)</label>
+                    <input type="text" id="req-game-id" class="modern-input w-full p-3 rounded-lg" placeholder="TvojGamertag123">
+                </div>
+                
+                <div>
+                    <label for="req-game-platform" class="block text-sm font-medium text-white/70 mb-1">Platforma</label>
+                    <select id="req-game-platform" class="modern-input w-full p-3 rounded-lg appearance-none">
+                        <option value="PC">PC (Steam/Epic/Battle.net)</option>
+                        <option value="PS5">PlayStation 5</option>
+                        <option value="XBOX">Xbox Series X/S</option>
+                        <option value="Mobile">Mobilné Hry (iOS/Android)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="req-reason" class="block text-sm font-medium text-white/70 mb-1">Dôvod Žiadosti (Popíš riziko)</label>
+                    <textarea id="req-reason" rows="4" class="modern-input w-full p-3 rounded-lg" placeholder="Napr. Súper mi neustále reportuje účet, chcem prevenciu..."></textarea>
+                </div>
+                
+                <div class="p-3 bg-yellow-900/50 rounded-lg border border-yellow-600/50">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="req-auto-enroll" class="h-4 w-4 text-yellow-500 rounded border-gray-600 focus:ring-yellow-500 bg-gray-700">
+                        <span class="ml-2 text-sm text-yellow-300">Súhlasím s automatickým auditom môjho herného správania (Pre maximalizáciu ochrany).</span>
+                    </label>
+                </div>
+
+                <button onclick="handleProtectionRequest()" class="modern-button text-white font-bold py-3 px-6 rounded-lg text-lg w-full bg-gradient-to-r from-red-600 to-yellow-600">
+                    ODOSLAŤ ŽIADOSŤ O OCHRANU
+                </button>
+                
+                <div id="protection-status-display" class="p-4 bg-gray-700/50 rounded-lg text-sm">
+                    <p class="font-semibold text-white">Aktuálny stav žiadosti:</p>
+                    <p id="current-protection-status" class="text-gray-400 mt-1 italic">Žiadosť zatiaľ nebola odoslaná.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Systémový Monitoring -->
+        <div id="content-monitor" class="dashboard-content space-y-6 hidden">
+            <h3 class="text-2xl font-semibold text-purple-400 border-b border-gray-700 pb-2">Sledovanie Dátových Tokov</h3>
+            <p class="text-gray-400 text-sm">Simulované monitorovanie lokálnej konektivity a správania účtu.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <p class="text-sm text-gray-400">CPU Záťaž (Lokálne)</p>
+                    <div class="h-2 w-full bg-gray-700 mt-1 rounded-full"><div class="h-full bg-green-500 rounded-full" style="width: 15%;"></div></div>
+                    <p class="text-xs text-green-500 mt-1">15% Optimalizované</p>
+                </div>
+                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <p class="text-sm text-gray-400">Šifrované Pripojenia (Simulácia)</p>
+                    <p class="text-xl text-blue-400 mt-1">Status: Zabezpečené</p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-900 rounded-lg h-40 overflow-y-auto text-xs font-mono text-green-400 border border-gray-700">
+                <p># [09:50:31] PING_TEST: PING OK (35ms)</p>
+                <p># [09:50:35] DATA_FLOW: Traffic normalized. (Bypass mode: ON)</p>
+                <p># [09:50:40] PROCESS_CHECK: External resource integrity check: PASSED</p>
+            </div>
+        </div>
+
+        <!-- 5. Audit Logs -->
+        <div id="content-logs" class="dashboard-content space-y-6 hidden">
+            <h3 class="text-2xl font-semibold text-purple-400 border-b border-gray-700 pb-2">Audit Logs Aktivít</h3>
+            <p class="text-gray-400 text-sm">Prehľad posledných interakcií komunitného účtu s lokálnym systémom (lokálne uložené).</p>
+            
+            <div class="p-4 bg-gray-900 rounded-lg h-40 overflow-y-auto text-xs font-mono text-gray-400 border border-gray-700">
+                <p>2026-01-10 10:00:00 | [AUDIT] System startup. User session initialized.</p>
+                <p>2026-01-10 10:00:15 | [AUTH] Login successful via Nickname.</p>
+                <p>2026-01-10 10:01:30 | [PROFILE] Profile data accessed by local client.</p>
+                <p>...</p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Globálna premenná pre aktuálne prihláseného používateľa
+        let currentNickname = null;
+
+        // Funkcia na zobrazenie správ (notifikácií)
+        function showMessage(text, isError = false) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = text;
+            msgBox.classList.remove('hidden', 'bg-red-900/50', 'text-red-300', 'bg-green-900/50', 'text-green-300');
+            
+            if (isError) {
+                msgBox.classList.add('bg-red-900/50', 'text-red-300');
+            } else {
+                msgBox.classList.add('bg-green-900/50', 'text-green-300');
+            }
+
+            // Animácia fade-in
+            msgBox.classList.remove('opacity-0');
+            msgBox.classList.add('opacity-100');
+
+            setTimeout(() => {
+                // Animácia fade-out
+                msgBox.classList.remove('opacity-100');
+                msgBox.classList.add('opacity-0');
+                setTimeout(() => msgBox.classList.add('hidden'), 500);
+            }, 5000);
+        }
+
+        // --- MANAŽMENT ZOBRAZENIA (VIEW MANAGEMENT) ---
+
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        // Prepínanie medzi Prihlásením a Registráciou v Modale
+        function showTab(tabName) {
+            const loginForm = document.getElementById('form-login');
+            const registerForm = document.getElementById('form-register');
+            
+            // Reset tried
+            document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active', 'border-purple-500'));
+            document.querySelectorAll('.modal-tab').forEach(t => t.classList.add('border-transparent'));
+
+            if (tabName === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                document.getElementById('tab-login').classList.add('active', 'border-purple-500');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                document.getElementById('tab-register').classList.add('active', 'border-purple-500');
+            }
+        }
+        
+        // Prepínanie medzi Landing a Dashboard view
+        function switchView(viewId) {
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+
+            if (viewId === 'dashboard-view') {
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.body.classList.add('dashboard-active'); // Zapnutie tmavého pozadia
+            } else {
+                document.getElementById('landing-view').classList.remove('hidden');
+                document.body.classList.remove('dashboard-active'); // Zapnutie gradientu
+            }
+        }
+        
+        // Prepínanie obsahu v Dashboard view
+        function showDashboardContent(contentId) {
+            document.querySelectorAll('.dashboard-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`content-${contentId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.dash-menu-button').forEach(btn => {
+                btn.classList.remove('bg-purple-600/50', 'border-purple-500/50', 'text-white');
+                btn.classList.add('text-white/70', 'hover:bg-gray-700/50');
+            });
+            
+            const activeBtn = document.getElementById(`menu-${contentId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-purple-600/50', 'border-purple-500/50', 'text-white');
+                activeBtn.classList.remove('text-white/70', 'hover:bg-gray-700/50');
+            }
+            
+            // Špeciálne načítanie dát pre sekcie s formulármi
+            if (contentId === 'profile') {
+                loadProfileEditData(currentNickname);
+            } else if (contentId === 'protection-request') {
+                 loadProtectionRequestData(currentNickname);
+            }
+        }
+
+        // Načítanie dát používateľa pre Dashboard
+        function loadUserData(nickname) {
+            currentNickname = nickname;
+            const userDataJson = localStorage.getItem(`gamepla631_user_${nickname}`);
+            let userData = {};
+            if (userDataJson) {
+                userData = JSON.parse(userDataJson);
+            } else {
+                showMessage('Chyba: Dáta používateľa sa nenašli.', true);
+                return;
+            }
+
+            // Nastavenie dát v Profile Overview
+            document.getElementById('dashboard-welcome').textContent = `Vitaj, Operátor ${nickname}`;
+            document.getElementById('profile-nickname-overview').textContent = nickname;
+
+            // Nastavenie dát do ne-editovateľnej sekcie profilu
+            document.getElementById('profile-nickname').textContent = userData.nickname || 'N/A';
+            
+            const profileStatus = document.getElementById('profile-status');
+            const statusText = userData.isProtected ? 'Status: AKTÍVNY (Normálny Hráč)' : 'Status: Neaktívny';
+            profileStatus.textContent = statusText;
+            profileStatus.classList.toggle('text-green-400', userData.isProtected);
+            profileStatus.classList.toggle('text-red-400', !userData.isProtected);
+            
+            // Zobrazenie Dashboardu a predvolenej sekcie
+            switchView('dashboard-view');
+            showDashboardContent('overview');
+        }
+        
+        // Načítanie dát do EDITOVATEĽNÉHO Formulára (Sekcia 2)
+        function loadProfileEditData(nickname) {
+            const userDataJson = localStorage.getItem(`gamepla631_user_${nickname}`);
+            let userData = {};
+            if (userDataJson) {
+                userData = JSON.parse(userDataJson);
+            }
+            
+            // Nastavenie hodnôt do formulára
+            document.getElementById('edit-age').value = userData.age || '';
+            document.getElementById('edit-description').value = userData.description || '';
+        }
+        
+        // Načítanie dát do žiadosti o ochranu (Sekcia 3)
+        function loadProtectionRequestData(nickname) {
+            const userDataJson = localStorage.getItem(`gamepla631_user_${nickname}`);
+            let userData = {};
+            if (userDataJson) {
+                userData = JSON.parse(userDataJson);
+            }
+            
+            // Načítanie stavu žiadosti
+            const currentProtectionStatusEl = document.getElementById('current-protection-status');
+            const protectionRequest = userData.protectionRequest;
+            
+            if (protectionRequest && protectionRequest.status) {
+                currentProtectionStatusEl.innerHTML = `Status: <span class="text-purple-300 font-bold">${protectionRequest.status}</span>. Naposledy odoslané pre Game ID: ${protectionRequest.gameId}.`;
+                
+                // Preload formulára s uloženými dátami
+                document.getElementById('req-game-id').value = protectionRequest.gameId || '';
+                document.getElementById('req-game-platform').value = protectionRequest.gamePlatform || 'PC';
+                document.getElementById('req-reason').value = protectionRequest.reason || '';
+                document.getElementById('req-auto-enroll').checked = protectionRequest.autoEnroll || false;
+            } else {
+                currentProtectionStatusEl.textContent = 'Žiadosť zatiaľ nebola odoslaná.';
+                // Vyčistiť formulár ak nie je žiadosť
+                document.getElementById('req-game-id').value = '';
+                document.getElementById('req-reason').value = '';
+                document.getElementById('req-auto-enroll').checked = false;
+            }
+        }
+
+
+        // --- AUTENTIFIKAČNÁ LOGIKA (MOCKUP) ---
+
+        function handleLogin() {
+            const nickname = document.getElementById('login-nickname').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!nickname || !password) {
+                showMessage('Chyba: Vyplňte komunitné meno a heslo.', true);
+                return;
+            }
+
+            const userDataJson = localStorage.getItem(`gamepla631_user_${nickname}`);
+            if (!userDataJson) {
+                 showMessage('Chyba: Účet neexistuje. Registrujte sa.', true);
+                 return;
+            }
+            
+            // Uloženie relácie a presmerovanie
+            localStorage.setItem('gamepla631_last_user', nickname);
+            closeAuthModal();
+            showMessage(`Úspešné prihlásenie! Systém je aktivovaný pre ${nickname}.`);
+            loadUserData(nickname);
+        }
+
+        function handleRegistration() {
+            const nickname = document.getElementById('reg-nickname').value.trim();
+            const age = document.getElementById('reg-age').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const protection = document.getElementById('reg-protection').checked;
+
+            if (!nickname || !age || !password) {
+                showMessage('Chyba: Vyplňte Meno, Vek a Heslo.', true);
+                return;
+            }
+            
+            if (localStorage.getItem(`gamepla631_user_${nickname}`)) {
+                showMessage(`Chyba: Účet s menom "${nickname}" už existuje.`, true);
+                return;
+            }
+
+            if (parseInt(age) < 10 || parseInt(age) > 99) {
+                showMessage('Chyba: Vek musí byť platné číslo medzi 10 a 99.', true);
+                return;
+            }
+
+            const userData = {
+                nickname: nickname,
+                age: age,
+                description: "Nový hráč, popis nebol zadaný.",
+                isProtected: protection,
+                registrationTime: new Date().toISOString()
+            };
+
+            localStorage.setItem(`gamepla631_user_${nickname}`, JSON.stringify(userData));
+
+            showMessage(`Registrácia pre ${nickname} úspešná! Prihláste sa.`, false);
+
+            // Vyčistenie formulára a prepnutie na prihlásenie
+            document.getElementById('reg-nickname').value = '';
+            document.getElementById('reg-age').value = '';
+            document.getElementById('reg-password').value = '';
+            document.getElementById('login-nickname').value = nickname; 
+            showTab('login');
+        }
+        
+        // --- LOGIKA FORMULÁRA V DASHBOARDSE ---
+        function handleProfileUpdate() {
+            if (!currentNickname) {
+                showMessage('Chyba: Nie ste prihlásený, nemôžem uložiť dáta.', true);
+                return;
+            }
+
+            const newAge = document.getElementById('edit-age').value.trim();
+            const newDescription = document.getElementById('edit-description').value.trim();
+
+            if (parseInt(newAge) < 10 || parseInt(newAge) > 99) {
+                showMessage('Chyba: Vek musí byť platné číslo medzi 10 a 99.', true);
+                return;
+            }
+            
+            // Načítanie starých dát a ich aktualizácia
+            const userDataJson = localStorage.getItem(`gamepla631_user_${currentNickname}`);
+            if (!userDataJson) {
+                showMessage('Chyba: Dáta profilu sa nenašli!', true);
+                return;
+            }
+
+            let userData = JSON.parse(userDataJson);
+            userData.age = newAge;
+            userData.description = newDescription;
+            
+            // Uloženie späť do lokálneho úložiska
+            localStorage.setItem(`gamepla631_user_${currentNickname}`, JSON.stringify(userData));
+
+            showMessage('Profilové dáta boli úspešne aktualizované!', false);
+        }
+
+        // NOVÁ LOGIKA PRE ŽIADOSŤ O OCHRANU
+        function handleProtectionRequest() {
+            if (!currentNickname) {
+                showMessage('Chyba: Nie ste prihlásený, nemôžem spracovať žiadosť.', true);
+                return;
+            }
+
+            const gameId = document.getElementById('req-game-id').value.trim();
+            const gamePlatform = document.getElementById('req-game-platform').value;
+            const reason = document.getElementById('req-reason').value.trim();
+            const autoEnroll = document.getElementById('req-auto-enroll').checked;
+
+            if (!gameId || !reason) {
+                showMessage('Chyba: Vyplňte Herné ID a Dôvod Žiadosti.', true);
+                return;
+            }
+            
+            // Načítanie starých dát
+            const userDataJson = localStorage.getItem(`gamepla631_user_${currentNickname}`);
+            let userData = JSON.parse(userDataJson);
+            
+            // Uloženie novej žiadosti
+            userData.protectionRequest = {
+                gameId: gameId,
+                gamePlatform: gamePlatform,
+                reason: reason,
+                autoEnroll: autoEnroll,
+                status: 'Odoslané na spracovanie', // Simulácia stavu
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem(`gamepla631_user_${currentNickname}`, JSON.stringify(userData));
+
+            showMessage('Žiadosť o Anti-Ban Ochranu bola úspešne odoslaná!', false);
+
+            // Aktualizácia stavu na obrazovke
+            loadProtectionRequestData(currentNickname); 
+            showDashboardContent('protection-request'); 
+        }
+
+        // --- MANAŽMENT RELÁCIE ---
+
+        function handleLogout() {
+            localStorage.removeItem('gamepla631_last_user');
+            currentNickname = null;
+            switchView('landing-view');
+            document.getElementById('login-nickname').value = '';
+            document.getElementById('login-password').value = '';
+            showMessage('Úspešné odhlásenie. Systém bol deaktivovaný.', false);
+        }
+
+        function checkAuthState() {
+             const lastUser = localStorage.getItem('gamepla631_last_user');
+             if (lastUser) {
+                 loadUserData(lastUser);
+             } else {
+                 switchView('landing-view');
+                 // Nastaví predvolené zobrazenie modalu pre prípad, že ho užívateľ otvorí
+                 showTab('login');
+             }
+        }
+
+        // Spustenie pri načítaní stránky
+        window.onload = checkAuthState;
+
+    </script>
+</body>
+</html>
