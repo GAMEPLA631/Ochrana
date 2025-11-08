@@ -265,7 +265,7 @@
             
             <h3 class="xl font-semibold text-white/90 mt-6">Dôležité Správy</h3>
             <ul class="space-y-3 text-sm text-gray-400">
-                <li class="p-3 border-l-4 border-blue-500 bg-gray-800/50 rounded-lg">Aktualizácia V4.1: Pridaná funkcia Žiadosť o Anti-Ban ochranu. Vyplň formulár v novej sekcii!</li>
+                <li class="p-3 border-l-4 border-blue-500 bg-gray-800/50 rounded-lg">Aktualizácia V4.1: Pridaná funkcia Žiadosť o Anti-Ban ochranu s vizuálnym odpočtom.</li>
                 <li class="p-3 border-l-4 border-yellow-500 bg-gray-800/50 rounded-lg">Upozornenie: Lokálne uložené dáta nie sú šifrované. Použi silné heslo.</li>
             </ul>
         </div>
@@ -307,38 +307,48 @@
             <h3 class="text-2xl font-semibold text-purple-400 border-b border-gray-700 pb-2">Žiadosť o Systémovú Ochrana (Anti-Ban)</h3>
             <p class="text-white/70 text-sm">Vyplňte formulár a požiadajte o zaradenie do špeciálneho protokolu na ochranu pred neoprávnenými banmi. Tieto dáta sú lokálne uložené vo vašom profile.</p>
 
-            <div class="space-y-4 max-w-lg">
-                <div>
-                    <label for="req-game-id" class="block text-sm font-medium text-white/70 mb-1">Herné ID (Gamertag/In-game meno)</label>
-                    <input type="text" id="req-game-id" class="modern-input w-full p-3 rounded-lg" placeholder="TvojGamertag123">
+            <div id="request-form-container" class="space-y-4 max-w-lg">
+                <!-- VIZUÁLNY ČASOVAČ (PREPÍNA SA S FORMULÁROM) -->
+                <div id="protection-timer-display" class="p-6 bg-purple-900/40 rounded-xl text-center font-bold hidden border border-purple-500 shadow-xl">
+                    <p class="text-sm text-purple-300 uppercase tracking-widest">Aktivácia Ochrany v Reálnom Čase:</p>
+                    <p id="timer-countdown" class="text-5xl mt-2 text-white font-extrabold">01:00</p>
+                    <p class="text-sm text-white/70 mt-2">Prosím, počkajte. Systém spracováva vašu žiadosť...</p>
                 </div>
                 
-                <div>
-                    <label for="req-game-platform" class="block text-sm font-medium text-white/70 mb-1">Platforma</label>
-                    <select id="req-game-platform" class="modern-input w-full p-3 rounded-lg appearance-none">
-                        <option value="PC">PC (Steam/Epic/Battle.net)</option>
-                        <option value="PS5">PlayStation 5</option>
-                        <option value="XBOX">Xbox Series X/S</option>
-                        <option value="Mobile">Mobilné Hry (iOS/Android)</option>
-                    </select>
+                <!-- Pôvodný Formulár na vyplnenie -->
+                <div id="input-form">
+                    <div>
+                        <label for="req-game-id" class="block text-sm font-medium text-white/70 mb-1">Herné ID (Gamertag/In-game meno)</label>
+                        <input type="text" id="req-game-id" class="modern-input w-full p-3 rounded-lg" placeholder="TvojGamertag123">
+                    </div>
+                    
+                    <div>
+                        <label for="req-game-platform" class="block text-sm font-medium text-white/70 mb-1">Platforma</label>
+                        <select id="req-game-platform" class="modern-input w-full p-3 rounded-lg appearance-none">
+                            <option value="PC">PC (Steam/Epic/Battle.net)</option>
+                            <option value="PS5">PlayStation 5</option>
+                            <option value="XBOX">Xbox Series X/S</option>
+                            <option value="Mobile">Mobilné Hry (iOS/Android)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="req-reason" class="block text-sm font-medium text-white/70 mb-1">Dôvod Žiadosti (Popíš riziko)</label>
+                        <textarea id="req-reason" rows="4" class="modern-input w-full p-3 rounded-lg" placeholder="Napr. Súper mi neustále reportuje účet, chcem prevenciu..."></textarea>
+                    </div>
+                    
+                    <div class="p-3 bg-yellow-900/50 rounded-lg border border-yellow-600/50">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" id="req-auto-enroll" class="h-4 w-4 text-yellow-500 rounded border-gray-600 focus:ring-yellow-500 bg-gray-700">
+                            <span class="ml-2 text-sm text-yellow-300">Súhlasím s automatickým auditom môjho herného správania (Pre maximalizáciu ochrany).</span>
+                        </label>
+                    </div>
+
+                    <button onclick="handleProtectionRequest()" class="modern-button text-white font-bold py-3 px-6 rounded-lg text-lg w-full bg-gradient-to-r from-red-600 to-yellow-600">
+                        ODOSLAŤ ŽIADOSŤ O OCHRANU
+                    </button>
                 </div>
 
-                <div>
-                    <label for="req-reason" class="block text-sm font-medium text-white/70 mb-1">Dôvod Žiadosti (Popíš riziko)</label>
-                    <textarea id="req-reason" rows="4" class="modern-input w-full p-3 rounded-lg" placeholder="Napr. Súper mi neustále reportuje účet, chcem prevenciu..."></textarea>
-                </div>
-                
-                <div class="p-3 bg-yellow-900/50 rounded-lg border border-yellow-600/50">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" id="req-auto-enroll" class="h-4 w-4 text-yellow-500 rounded border-gray-600 focus:ring-yellow-500 bg-gray-700">
-                        <span class="ml-2 text-sm text-yellow-300">Súhlasím s automatickým auditom môjho herného správania (Pre maximalizáciu ochrany).</span>
-                    </label>
-                </div>
-
-                <button onclick="handleProtectionRequest()" class="modern-button text-white font-bold py-3 px-6 rounded-lg text-lg w-full bg-gradient-to-r from-red-600 to-yellow-600">
-                    ODOSLAŤ ŽIADOSŤ O OCHRANU
-                </button>
-                
                 <div id="protection-status-display" class="p-4 bg-gray-700/50 rounded-lg text-sm">
                     <p class="font-semibold text-white">Aktuálny stav žiadosti:</p>
                     <p id="current-protection-status" class="text-gray-400 mt-1 italic">Žiadosť zatiaľ nebola odoslaná.</p>
@@ -386,9 +396,15 @@
 
 
     <script>
-        // Globálna premenná pre aktuálne prihláseného používateľa
+        // Globálne konštanty a premenné
         let currentNickname = null;
-        const ACTIVATION_DELAY_MS = 60000; // Presne 1 minúta (60 sekúnd)
+        const ACTIVATION_DELAY_MS = 60000; // Presne 1 minúta
+        const TIME_LIMIT_SECONDS = 60; // 60 sekúnd pre odpočet
+
+        // Premenné pre vizuálny odpočet (Protection Request Timer)
+        let protectionTimerInterval = null;
+        let timeRemainingProtection = TIME_LIMIT_SECONDS;
+
 
         // Funkcia na zobrazenie správ (notifikácií)
         function showMessage(text, isError = false) {
@@ -414,6 +430,55 @@
             }, 5000);
         }
 
+        // Pomocná funkcia na formátovanie času (MM:SS)
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(seconds).padStart(2, '0');
+            
+            return `${formattedMinutes}:${formattedSeconds}`;
+        }
+        
+        // --- LOGIKA VIZUÁLNEHO ODPOČTU ---
+
+        function updateProtectionTimer() {
+            const timerCountdownEl = document.getElementById('timer-countdown');
+
+            // Aktualizácia displeja (01:00 -> 00:59, atď.)
+            timerCountdownEl.textContent = formatTime(timeRemainingProtection);
+
+            if (timeRemainingProtection <= 0) {
+                // Vizuálny odpočet hotový, ale finálna zmena statusu sa deje v setTimeout()
+                // v handleProtectionRequest, čo zaisťuje presnosť 60s.
+                clearInterval(protectionTimerInterval);
+                document.getElementById('protection-timer-display').classList.add('hidden');
+                // Status sa aktualizuje za 1 sekundu cez hlavný setTimeout
+                return;
+            }
+
+            // Dekrement času
+            timeRemainingProtection -= 1;
+        }
+
+        function startProtectionTimer() {
+            // Skryť formulár, ukázať časovač
+            document.getElementById('input-form').classList.add('hidden');
+            document.getElementById('protection-timer-display').classList.remove('hidden');
+
+            // Reset a spustenie odpočtu
+            timeRemainingProtection = TIME_LIMIT_SECONDS;
+            
+            if (protectionTimerInterval) {
+                clearInterval(protectionTimerInterval);
+            }
+            
+            // Spustenie intervalu na 1000ms (1 sekunda)
+            protectionTimerInterval = setInterval(updateProtectionTimer, 1000);
+            updateProtectionTimer(); // Okamžitá prvá aktualizácia
+        }
+        
         // --- MANAŽMENT ZOBRAZENIA (VIEW MANAGEMENT) ---
 
         function openAuthModal() {
@@ -543,7 +608,15 @@
             // Načítanie stavu žiadosti
             const currentProtectionStatusEl = document.getElementById('current-protection-status');
             const protectionRequest = userData.protectionRequest;
+            const timerDisplayEl = document.getElementById('protection-timer-display');
+            const inputFormEl = document.getElementById('input-form');
             
+            // Vyčistíme starý interval, ak nejaký beží
+            if (protectionTimerInterval) {
+                clearInterval(protectionTimerInterval);
+                protectionTimerInterval = null;
+            }
+
             if (protectionRequest && protectionRequest.status) {
                 currentProtectionStatusEl.innerHTML = `Status: <span class="text-purple-300 font-bold">${protectionRequest.status}</span>. Naposledy odoslané pre Game ID: ${protectionRequest.gameId}.`;
                 
@@ -552,12 +625,27 @@
                 document.getElementById('req-game-platform').value = protectionRequest.gamePlatform || 'PC';
                 document.getElementById('req-reason').value = protectionRequest.reason || '';
                 document.getElementById('req-auto-enroll').checked = protectionRequest.autoEnroll || false;
+                
+                // Ak je status 'Spracováva sa' po obnovení stránky (pretože timerInterval je null)
+                if (protectionRequest.status.includes('Spracováva sa') && !userData.isProtected) {
+                    // Po obnovení stránky nevieme presný čas, len ukážeme prebiehajúci status
+                    timerDisplayEl.classList.add('hidden');
+                    inputFormEl.classList.remove('hidden');
+                    currentProtectionStatusEl.innerHTML = `Status: <span class="text-yellow-400 font-bold">SPRACOVÁVA SA</span> (Dokončenie bolo očakávané, prosím, odošlite žiadosť znova pre re-aktiváciu časovača).`;
+                } else if (userData.isProtected) {
+                    // Ak je už chránený
+                    timerDisplayEl.classList.add('hidden');
+                    inputFormEl.classList.remove('hidden');
+                    currentProtectionStatusEl.innerHTML = `Status: <span class="text-green-400 font-bold">${protectionRequest.status}</span>. Ochrana je AKTÍVNA.`;
+                }
             } else {
                 currentProtectionStatusEl.textContent = 'Žiadosť zatiaľ nebola odoslaná.';
                 // Vyčistiť formulár ak nie je žiadosť
                 document.getElementById('req-game-id').value = '';
                 document.getElementById('req-reason').value = '';
                 document.getElementById('req-auto-enroll').checked = false;
+                timerDisplayEl.classList.add('hidden');
+                inputFormEl.classList.remove('hidden');
             }
         }
 
@@ -661,11 +749,17 @@
             showMessage('Profilové dáta boli úspešne aktualizované!', false);
         }
 
-        // NOVÁ LOGIKA PRE ŽIADOSŤ O OCHRANU
+        // LOGIKA PRE ŽIADOSŤ O OCHRANU s 1-minútovým odpočtom
         function handleProtectionRequest() {
             if (!currentNickname) {
                 showMessage('Chyba: Nie ste prihlásený, nemôžem spracovať žiadosť.', true);
                 return;
+            }
+            
+            // Ak už beží časovač, zabráňte odoslaniu
+            if (protectionTimerInterval) {
+                 showMessage('Žiadosť sa už spracováva. Prosím, počkajte na dokončenie odpočtu.', true);
+                 return;
             }
 
             const gameId = document.getElementById('req-game-id').value.trim();
@@ -688,22 +782,25 @@
                 gamePlatform: gamePlatform,
                 reason: reason,
                 autoEnroll: autoEnroll,
-                // STATUS ZMENENÝ: Už nie je "simulovaný"
-                status: 'Žiadosť prijatá do frontu. Ochrana sa aktivuje automaticky po 60 sekundách.', 
+                status: 'Žiadosť spracováva systém, čaká sa na aktiváciu ochrany (1 minúta).', 
                 timestamp: new Date().toISOString()
             };
             
-            // Zatiaľ neaktivujeme ochranu, len uložíme žiadosť
+            // Ochrana sa Vypne, aby sa po minúte zapla
+            userData.isProtected = false;
+            
+            // Uloženie späť do lokálneho úložiska
             localStorage.setItem(`gamepla631_user_${currentNickname}`, JSON.stringify(userData));
 
-            // SPRÁVA ZMENENÁ: Už neobsahuje slovo "simulácie"
-            showMessage('Žiadosť o Anti-Ban Ochranu bola prijatá. Presný čas aktivácie: 1 minúta.', false);
-
-            // Aktualizácia stavu na obrazovke
+            // 1. Spustenie VIZUÁLNEHO ODPOČTU
+            startProtectionTimer();
+            
+            // 2. Aktualizácia stavu na obrazovke
             loadProtectionRequestData(currentNickname); 
             showDashboardContent('protection-request');
+            showMessage('Žiadosť o Anti-Ban Ochranu bola prijatá. Presný čas aktivácie: 1 minúta.', false);
             
-            // --- AKTIVÁCIA PO 60 SEKUNDÁCH (1 MINÚTA REÁLNEHO ČASU) ---
+            // 3. --- AKTIVÁCIA PO 60 SEKUNDÁCH (1 MINÚTA REÁLNEHO ČASU) ---
             setTimeout(() => {
                 // Opätovné načítanie pre prípad, že používateľ medzitým zmenil niečo iné
                 const updatedUserDataJson = localStorage.getItem(`gamepla631_user_${currentNickname}`);
@@ -711,7 +808,7 @@
 
                 // Zmena stavu na chránené a nastavenie finálnej správy
                 updatedUserData.isProtected = true;
-                updatedUserData.protectionRequest.status = 'Váš Účet je Chránený Spoločnosťou GAMEPLA631';
+                updatedUserData.protectionRequest.status = 'Ste Chránený Spoločnosťou GAMEPLA631';
 
                 // Uloženie zmeny
                 localStorage.setItem(`gamepla631_user_${currentNickname}`, JSON.stringify(updatedUserData));
@@ -719,7 +816,7 @@
                 // Obnovenie Dashboardu a zobrazenie správy
                 loadUserData(currentNickname); // Obnoví Overview a Profile Status
                 loadProtectionRequestData(currentNickname); // Obnoví stav žiadosti
-                showMessage('Úspech! Váš Účet je Chránený Spoločnosťou GAMEPLA631.', false);
+                showMessage('ÚSPECH! Ochranný protokol bol AKTIVOVANÝ: Ste Chránený Spoločnosťou GAMEPLA631.', false);
                 
             }, ACTIVATION_DELAY_MS); // Presne 60 sekúnd
         }
@@ -752,4 +849,5 @@
     </script>
 </body>
 </html>
+
 
