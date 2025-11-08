@@ -163,7 +163,7 @@
         </footer>
     </div>
     
-    <!-- 2. AUTENTIFIKAČNÝ MODAL (Prihlásenie/Registrácia) -->
+    <!-- 2. AUTENTIFIKACNY MODAL (Prihlásenie/Registrácia) -->
     <div id="auth-modal" class="fixed inset-0 modal-bg hidden flex items-center justify-center p-4 z-50 transition duration-300">
         
         <div class="max-w-md w-full modal-card rounded-2xl p-8 space-y-6 relative">
@@ -388,6 +388,7 @@
     <script>
         // Globálna premenná pre aktuálne prihláseného používateľa
         let currentNickname = null;
+        const SIMULATED_ACTIVATION_DELAY_MS = 60000; // Simulácia 1 minúty (60 sekúnd)
 
         // Funkcia na zobrazenie správ (notifikácií)
         function showMessage(text, isError = false) {
@@ -501,7 +502,14 @@
             document.getElementById('profile-nickname').textContent = userData.nickname || 'N/A';
             
             const profileStatus = document.getElementById('profile-status');
-            const statusText = userData.isProtected ? 'Status: AKTÍVNY (Normálny Hráč)' : 'Status: Neaktívny';
+            
+            // Kontrola statusu na základe flagu isProtected
+            let statusText = 'Status: Neaktívny';
+            if (userData.isProtected) {
+                // Ak je účet chránený, vezme status zo žiadosti, ak existuje, inak použije default
+                 statusText = userData.protectionRequest?.status || 'Status: AKTÍVNY (Normálny Hráč)';
+            }
+            
             profileStatus.textContent = statusText;
             profileStatus.classList.toggle('text-green-400', userData.isProtected);
             profileStatus.classList.toggle('text-red-400', !userData.isProtected);
@@ -554,7 +562,7 @@
         }
 
 
-        // --- AUTENTIFIKAČNÁ LOGIKA (MOCKUP) ---
+        // --- AUTENTIFIKACNÁ LOGIKA (MOCKUP) ---
 
         function handleLogin() {
             const nickname = document.getElementById('login-nickname').value.trim();
@@ -604,7 +612,9 @@
                 age: age,
                 description: "Nový hráč, popis nebol zadaný.",
                 isProtected: protection,
-                registrationTime: new Date().toISOString()
+                registrationTime: new Date().toISOString(),
+                // Inicializácia žiadosti o ochranu na null
+                protectionRequest: null 
             };
 
             localStorage.setItem(`gamepla631_user_${nickname}`, JSON.stringify(userData));
@@ -672,23 +682,44 @@
             const userDataJson = localStorage.getItem(`gamepla631_user_${currentNickname}`);
             let userData = JSON.parse(userDataJson);
             
-            // Uloženie novej žiadosti
+            // Uloženie novej žiadosti so statusom "Spracováva sa"
             userData.protectionRequest = {
                 gameId: gameId,
                 gamePlatform: gamePlatform,
                 reason: reason,
                 autoEnroll: autoEnroll,
-                status: 'Odoslané na spracovanie', // Simulácia stavu
+                status: 'Žiadosť spracovávaná (Aktivácia ochrany prebehne o 60 sekúnd)', // Nový status s časom
                 timestamp: new Date().toISOString()
             };
             
+            // Zatiaľ neaktivujeme ochranu, len uložíme žiadosť
             localStorage.setItem(`gamepla631_user_${currentNickname}`, JSON.stringify(userData));
 
-            showMessage('Žiadosť o Anti-Ban Ochranu bola úspešne odoslaná!', false);
+            showMessage('Žiadosť o Anti-Ban Ochranu bola prijatá. Čakajte na aktiváciu (60 sekúnd simulácie)...', false);
 
             // Aktualizácia stavu na obrazovke
             loadProtectionRequestData(currentNickname); 
-            showDashboardContent('protection-request'); 
+            showDashboardContent('protection-request');
+            
+            // --- SIMULÁCIA AKTIVÁCIE PO 60 SEKUNDÁCH (60000 ms) ---
+            setTimeout(() => {
+                // Opätovné načítanie pre prípad, že používateľ medzitým zmenil niečo iné
+                const updatedUserDataJson = localStorage.getItem(`gamepla631_user_${currentNickname}`);
+                let updatedUserData = JSON.parse(updatedUserDataJson);
+
+                // Zmena stavu na chránené a nastavenie finálnej správy
+                updatedUserData.isProtected = true;
+                updatedUserData.protectionRequest.status = 'Váš Účet je Chránený Spoločnosťou GAMEPLA631';
+
+                // Uloženie zmeny
+                localStorage.setItem(`gamepla631_user_${currentNickname}`, JSON.stringify(updatedUserData));
+
+                // Obnovenie Dashboardu a zobrazenie správy
+                loadUserData(currentNickname); // Obnoví Overview a Profile Status
+                loadProtectionRequestData(currentNickname); // Obnoví stav žiadosti
+                showMessage('Úspech! Váš Účet je Chránený Spoločnosťou GAMEPLA631.', false);
+                
+            }, SIMULATED_ACTIVATION_DELAY_MS); // 60 sekúnd
         }
 
         // --- MANAŽMENT RELÁCIE ---
